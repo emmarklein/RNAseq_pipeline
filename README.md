@@ -11,10 +11,9 @@ Here is the typical RNA-seq pipeline flow...
 https://hbctraining.github.io/Intro-to-rnaseq-hpc-O2/lessons/03_alignment.html
 
 ## SRA download
-Let’s start with raw FASTQ files (.fastq). These files contain our sequencing information! We can download Sequence Read Archive (SRA) data from: https://www.ncbi.nlm.nih.gov/sra. This site stores raw sequencing data and alignment information.
+Let’s start with raw FASTQ files (.fastq). These files contain our sequencing information! We can download Sequence Read Archive (SRA) data from: https://www.ncbi.nlm.nih.gov/sra. This site stores raw sequencing data and alignment information. I will be using SRR8615934 as example data!
 
 ```
-function test() {
-  console.log("notice the blank line before this function?");
-}
+module load sratoolkit
+prefetch --max-size 1000000000000 --force all -q SRR8615934
 ```
