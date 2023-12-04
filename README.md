@@ -7,6 +7,6 @@ This repository includes everything you need for genome mapping. Raw FASTQ files
 Here is the typical RNA-seq pipeline flow...
 
 <img width="531" alt="Screenshot 2023-12-04 at 3 32 06 PM" src="https://github.com/emmarklein/RNAseq_pipeline/assets/152921397/41d26ea8-7045-4986-8ec6-e24e0dffa237">
-
-
 https://hbctraining.github.io/Intro-to-rnaseq-hpc-O2/lessons/03_alignment.html
+
+Let’s start with raw FASTQ files (.fastq).. These files include our sequencing information! We can download Sequence Read Archive (SRA) data from: https://www.ncbi.nlm.nih.gov/sra . This site stores raw sequencing data and alignment information. 
