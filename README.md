@@ -33,3 +33,6 @@ gunzip -c SRR8615934_2.fastq.gz > /insert/your/path/SRR8615934_2.fastq
 ```
 
 Now, we finally have our unzipped raw fastq files!
+
+## Building a STAR Index
+
