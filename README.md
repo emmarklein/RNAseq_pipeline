@@ -22,3 +22,8 @@ The output should be the complete .SRA file from the site above. Next, we need t
 module load sratoolkit
 fastq-dump --split-files --gzip -O /insert/your/path/SRR8615934 /insert/your/path/SRR8615934/SRR8615934.sra
 ```
+
+## Decompressing fastq.gz
+
+Now, we have both reads (SRR8670768_1.fastq.gz and SRR8670768_2.fastq.gz), but they need to be decompressed!
+
