@@ -15,3 +15,10 @@ Let’s start with raw FASTQ files (.fastq). These files contain our sequencing 
 module load sratoolkit
 prefetch --max-size 1000000000000 --force all -q SRR8615934
 ```
+
+The output should be the complete .SRA file from the site above. Next, we need to split the SRA file because it includes paired-end reads. Let’s continue using sratoolkit! 
+
+```
+module load sratoolkit
+fastq-dump --split-files --gzip -O /insert/your/path/SRR8615934 /insert/your/path/SRR8615934/SRR8615934.sra
+```
