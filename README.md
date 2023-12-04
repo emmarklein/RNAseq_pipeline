@@ -1,1 +1,1 @@
-# RNAseq_pipeline
+# RNAseq pipeline
