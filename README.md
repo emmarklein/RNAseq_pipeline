@@ -2,7 +2,7 @@
 
 Who is excited to work with RNA-seq data? 
 
-This repository includes everything you need for genome mapping. Raw FASTQ files serve as input and undergo genome mapping to a reference. The tutorial below includes the T2T and GRCh38 reference.
+This repository includes everything you need for genome mapping. Raw FASTQ files serve as input and undergo genome mapping to a reference. We will go through this process step by step, using the T2T and GRCh38 references.
 
 Here is the typical RNA-seq pipeline flow...
 
