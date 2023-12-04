@@ -8,7 +8,7 @@ This repository includes everything you need for genome mapping. Raw FASTQ files
 
 https://hbctraining.github.io/Intro-to-rnaseq-hpc-O2/lessons/03_alignment.html
 
-## SRA download
+## SRA download and splitting
 Let’s start with raw FASTQ files (.fastq). These files contain our sequencing information. We can download Sequence Read Archive (SRA) data from: https://www.ncbi.nlm.nih.gov/sra. This site stores raw sequencing data and alignment information. I will be using SRR8615934 as example data!
 
 ```
