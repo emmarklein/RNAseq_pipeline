@@ -7,4 +7,4 @@ background: rna seq videos, explain the pipeline process before going into each 
 **Goal:** Genome mapping with STAR aligner
 
 
-
+https://hbctraining.github.io/Intro-to-rnaseq-hpc-O2/lessons/03_alignment.html
