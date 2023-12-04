@@ -1,4 +1,4 @@
-# RNAseq pipeline
+# RNA-seq pipeline
 
 Who is excited to work with RNA-seq data?
 
