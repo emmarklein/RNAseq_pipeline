@@ -1,1 +1,0 @@
-https://hbctraining.github.io/Intro-to-rnaseq-hpc-O2/lessons/03_alignment.html
