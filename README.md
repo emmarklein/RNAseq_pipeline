@@ -2,7 +2,7 @@
 
 Excited to work with RNA-seq data? 
 
-This repository includes everything you need for genome mapping. Raw FASTQ files serve as input and undergo genome alignment to a reference. We will go through this process step by step using the T2T and GRCh38 references.
+This repository includes everything you need for genome mapping. Raw FASTQ files serve as input and undergo genome alignment to a reference. We will go through this process step by step using the T2T reference.
 
 <img width="531" alt="Screenshot 2023-12-04 at 3 32 06 PM" src="https://github.com/emmarklein/RNAseq_pipeline/assets/152921397/41d26ea8-7045-4986-8ec6-e24e0dffa237">
 
@@ -36,3 +36,10 @@ Now, we finally have our unzipped raw fastq files!
 
 ## Building a STAR Index
 
+Before we map the reads, we must build a genome index. I will be using the T2T reference with the reference genome FASTA file (GCF_009914755.1_T2T-CHM13v2.0_genomic.fna).
+
+```
+module load star
+STAR --runThreadN 8 --runMode genomeGenerate --genomeDir /insert/your/path/T2T_genomeDir --genomeFastaFiles /insert/your/path/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna
+```
+This command will build the index from the reference file and store the genome index files in the directory, T2T_genomeDir.
