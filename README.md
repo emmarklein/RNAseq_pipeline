@@ -59,4 +59,18 @@ module load star
 STAR --runThreadN 8 --genomeDir /your/path/T2T_genomeDir/ --outFileNamePrefix SRR8615934_ --readFilesIn /your/path/SRR8615934_1.fastq /your/path/SRR8615934_2.fastq
 ```
 
-This command uses the index files (in T2T_genomeDir) and FASTQ files for STAR alignment. The output of STAR aligner is read counts per gene!
+This command uses the index files (in T2T_genomeDir) and FASTQ files for STAR alignment. The output of STAR aligner is read counts per gene! Specifically, we have a SAM file (Sequence Alignment/Map), which are text files that contain alignment information.
+
+## Filtering
+
+Let's filter out the reads that are not meeting our quality threshold.
+
+```
+module load samtools
+samtools view -q 30 /your/path/SRR8615934_Aligned.out.sam > SRR8615934_filtered.sam
+```
+Awesome! We can do a LOT with this information. For now, let's try making wiggle tracks to visualize the data.
+
+## Wiggle Tracks
+
+
