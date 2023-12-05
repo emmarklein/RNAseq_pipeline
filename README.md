@@ -43,3 +43,7 @@ module load star
 STAR --runThreadN 8 --runMode genomeGenerate --genomeDir /insert/your/path/T2T_genomeDir --genomeFastaFiles /insert/your/path/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna
 ```
 This command builds the index from the reference file and stores the genome index files in the directory, T2T_genomeDir.
+
+## STAR Alignment
+
+Now, we are ready for alignment! STAR Aligner determines locations in the human genome associated with read data. This alignment strategy is highly accurate and outperforms other aligners in mapping speed. The STAR alignment algorithm includes two main steps: (1) Seed searching and (2) Clustering, stitching, and scoring. In seed searching, STAR aligns reads with the longest sequence that matches one or more locations on the reference genome. Seeds are different parts of a particular read that are mapped separately to different genomic locations. This alignment method is sequential – STAR continues to search for unmapped sections of each read that matches the reference genome. STAR uses an uncompressed suffix array to search for the longest matches. Separate seeds are combined to create a full read by clustering, stitching, and scoring. The output of STAR aligner is read counts per gene.
