@@ -36,7 +36,7 @@ Now, we finally have our unzipped raw fastq files!
 
 ## Building a STAR Index
 
-Before we map the reads, we must build a genome index. I will be using the T2T reference with the reference genome FASTA file (GCF_009914755.1_T2T-CHM13v2.0_genomic.fna).
+Before we map the reads, we must build a genome index. Let's use the T2T reference with the reference genome FASTA file (GCF_009914755.1_T2T-CHM13v2.0_genomic.fna).
 
 ```
 module load star
