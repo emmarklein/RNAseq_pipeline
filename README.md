@@ -42,4 +42,4 @@ Before we map the reads, we must build a genome index. I will be using the T2T r
 module load star
 STAR --runThreadN 8 --runMode genomeGenerate --genomeDir /insert/your/path/T2T_genomeDir --genomeFastaFiles /insert/your/path/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna
 ```
-This command will build the index from the reference file and store the genome index files in the directory, T2T_genomeDir.
+This command builds the index from the reference file and stores the genome index files in the directory, T2T_genomeDir.
