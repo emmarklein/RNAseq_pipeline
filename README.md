@@ -59,4 +59,4 @@ module load star
 STAR --runThreadN 8 --genomeDir /your/path/T2T_genomeDir/ --outFileNamePrefix SRR8615934_ --readFilesIn /your/path/SRR8615934_1.fastq /your/path/SRR8615934_2.fastq
 ```
 
-This command uses the index files (in T2T_genomeDir) and FASTQ files (SRR8615934_1.fastq) for STAR alignment. The output of STAR aligner is read counts per gene!
+This command uses the index files (in T2T_genomeDir) and FASTQ files for STAR alignment. The output of STAR aligner is read counts per gene!
