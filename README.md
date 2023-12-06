@@ -61,7 +61,7 @@ STAR --runThreadN 8 --genomeDir /your/path/T2T_genomeDir/ --outFileNamePrefix SR
 
 This command uses the index files (in T2T_genomeDir) and FASTQ files for STAR alignment. The output of STAR aligner is read counts per gene! Specifically, we have a SAM file (Sequence Alignment/Map), which are text files that contain alignment information.
 
-## Filtering
+## Filtering (Optional)
 
 Let's filter out the reads that are not meeting our quality threshold.
 
