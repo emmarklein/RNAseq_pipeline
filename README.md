@@ -75,14 +75,14 @@ Awesome! We can do a LOT with this information. For now, let's try making wiggle
 
 To visualize our data, we can create wiggle tracks to upload to UCSC genome browser. Let's run bigsam_to_wig_mm10_wcigar4.pl on both filtered and unfiltered SAM files. This perl script takes in the parameters below to buil wiggle tracks. 
 
-# Parameters:
-# 1. SAM file
-# 2. chrNameLength.txt file generated in the genome build step of STAR
-# 3. Header for output files to be displayed in genome browser
-# 4. Color of the wiggle track
-# 5. Whether the data is paired-end
-# 6. Whether to log10 normalize the data
-# 7. Bin size for the wiggle track
+Parameters:
+1. SAM file
+2. chrNameLength.txt file generated in the genome build step of STAR
+3. Header for output files to be displayed in genome browser
+4. Color of the wiggle track
+5. Whether the data is paired-end
+6. Whether to log10 normalize the data
+7. Bin size for the wiggle track
 
 ```
 module load perl/5.18.2
