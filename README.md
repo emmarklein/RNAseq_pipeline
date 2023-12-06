@@ -90,7 +90,7 @@ module load perl/5.18.2
 sbatch -t 48:00:00 --wrap="perl /your/path/bigsam_to_wig_mm10_wcigar4.pl /your/path/SRR8615934_Aligned.out.sam /your/path/T2T_genomeDir/chrNameLength.txt SRR8615934_unfiltered red y y 50"
 sbatch -t 48:00:00 --wrap="perl /your/path/bigsam_to_wig_mm10_wcigar4.pl /your/path/SRR8615934_filtered.sam /your/path/emma/T2T_genomeDir/chrNameLength.txt SRR8615934_filtered red y y 50"
 ```
-The output is filtered and unfiltered .wig files. Before uploading them to UCSC, it is important to update the chromosome names. The script, change_chromosome_names.py, changes chromosome names for T2T-CHM13 v2.0 to match the traditional chromosome names.
+The output is filtered and unfiltered .wig files. Before uploading them to UCSC, it is important to update the chromosome names. The script below (change_chromosome_names.py) changes chromosome names for T2T-CHM13 v2.0 to match the traditional chromosome names.
 
 ```
 # changes chromosome names for T2T-CHM13 v2.0 to match the traditional chromosome names
@@ -158,4 +158,12 @@ for line in input_file:
 input_file.close()
 output_file.close()
 ```
+
+Let's update the chromosome names to generate the final .wig files! Run the commands below with the path to your wiggle tracks from the previous step.
+
+```
+sbatch --wrap="python3 change_chromosome_names.py /your/path/SRR8615934_filtered.wig"
+sbatch --wrap="python3 change_chromosome_names.py /your/path/SRR8615934_unfiltered.wig"
+```
+
 
