@@ -166,4 +166,8 @@ sbatch --wrap="python3 change_chromosome_names.py /your/path/SRR8615934_filtered
 sbatch --wrap="python3 change_chromosome_names.py /your/path/SRR8615934_unfiltered.wig"
 ```
 
+The .wig files can be uploaded to the [UCSC Genome Browser](https://genome.ucsc.edu/cgi-bin/hgCustom?hgsid=1804009504_57IfGr7IsksWm32NIHRQkaBNJSFc) for visualization. 
+
+# Loading Wiggle Tracks
+
 
