@@ -28,8 +28,8 @@ fastq-dump --split-files --gzip -O /your/path/SRR8615934 /your/path/SRR8615934/S
 Both reads (SRR8670768_1.fastq.gz and SRR8670768_2.fastq.gz) need to be decompressed! We can use gunzip for this step.
 
 ```
-gunzip -c SRR8615934_1.fastq.gz > /your/path/SRR8615934_1.fastq
-gunzip -c SRR8615934_2.fastq.gz > /your/path/SRR8615934_2.fastq
+gunzip -c /your/path/SRR8615934_1.fastq.gz > /your/path/SRR8615934_1.fastq
+gunzip -c /your/path/SRR8615934_2.fastq.gz > /your/path/SRR8615934_2.fastq
 ```
 
 Now, we finally have our unzipped raw fastq files!
