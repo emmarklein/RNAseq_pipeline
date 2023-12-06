@@ -73,7 +73,7 @@ Awesome! We can do a LOT with this information. For now, let's try making wiggle
 
 ## Wiggle Tracks
 
-To visualize our data, we can create wiggle tracks to upload to UCSC genome browser. Let's run bigsam_to_wig_mm10_wcigar4.pl on both filtered and unfiltered SAM files. This perl script takes in the parameters below to buil wiggle tracks. 
+To visualize our data, we can create wiggle tracks to upload to UCSC genome browser. Let's run bigsam_to_wig_mm10_wcigar4.pl on both filtered and unfiltered SAM files. This perl script takes in the parameters below to build wiggle tracks. 
 
 Parameters:
 1. SAM file
@@ -89,5 +89,73 @@ module load perl/5.18.2
 
 sbatch -t 48:00:00 --wrap="perl /your/path/bigsam_to_wig_mm10_wcigar4.pl /your/path/SRR8615934_Aligned.out.sam /your/path/T2T_genomeDir/chrNameLength.txt SRR8615934_unfiltered red y y 50"
 sbatch -t 48:00:00 --wrap="perl /your/path/bigsam_to_wig_mm10_wcigar4.pl /your/path/SRR8615934_filtered.sam /your/path/emma/T2T_genomeDir/chrNameLength.txt SRR8615934_filtered red y y 50"
+```
+The output is filtered and unfiltered .wig files. Before uploading them to UCSC, it is important to update the chromosome names. The script, change_chromosome_names.py, changes chromosome names for T2T-CHM13 v2.0 to match the traditional chromosome names.
+
+```
+# changes chromosome names for T2T-CHM13 v2.0 to match the traditional chromosome names
+# input: T2T-CHM13 v2.0 based wiggle track
+# output: T2T-CHM13 v2.0 based wiggle track with chromosome names changed
+
+# usage: python change_chromosome_names.py <input_file>
+
+import sys
+import os
+import re
+
+# open file from input parameter
+input_file = open(sys.argv[1], "r")
+
+# open output file
+output_file_name = sys.argv[1].strip(".wig") + "_final.wig"
+output_file = open(output_file_name, "w")
+
+
+# create chromosome translation dictionary
+chromosome_translation = {
+    "NC_060925.1" : "chr1",
+    "NC_060926.1" : "chr2",
+    "NC_060927.1" : "chr3",
+    "NC_060928.1" : "chr4",
+    "NC_060929.1" : "chr5",
+    "NC_060930.1" : "chr6",
+    "NC_060931.1" : "chr7",
+    "NC_060932.1" : "chr8",
+    "NC_060933.1" : "chr9",
+    "NC_060934.1" : "chr10",
+    "NC_060935.1" : "chr11",
+    "NC_060936.1" : "chr12",
+    "NC_060937.1" : "chr13",
+    "NC_060938.1" : "chr14",
+    "NC_060939.1" : "chr15",
+    "NC_060940.1" : "chr16",
+    "NC_060941.1" : "chr17",
+    "NC_060942.1" : "chr18",
+    "NC_060943.1" : "chr19",
+    "NC_060944.1" : "chr20",
+    "NC_060945.1" : "chr21",
+    "NC_060946.1" : "chr22",
+    "NC_060947.1" : "chrX",
+    "NC_060948.1" : "chrY"
+    #, "NC_060949.1" : "chrM"
+}
+
+# read each line of the input file
+for line in input_file:
+    # if the line starts with "variableStep", write it to the output file
+    if line.startswith("variableStep"):
+        components = line.split(" ")
+        chromosome = components[1].split("=")[1]
+        new_chrom = chromosome_translation[chromosome]
+        new_line = "variableStep chrom=" + new_chrom + " span=" + components[2].split("=")[1]
+        output_file.write(new_line)
+
+    else:
+        output_file.write(line)
+    
+
+
+input_file.close()
+output_file.close()
 ```
 
