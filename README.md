@@ -85,13 +85,13 @@ To visualize our data, we can create wiggle tracks to upload to UCSC genome brow
 
 ```
 module load samtools
-samtools view -bS /your/path/SRR8615934_hg_Aligned.out.sam > /proj/brunklab/users/emma/SRR8615934_hg_Aligned.out.bam
-samtools view -bS /your/path/SRR8615934_hg_filtered.sam > /proj/brunklab/users/emma/SRR8615934_hg_filtered.bam
+samtools view -bS /your/path/SRR8615934_hg_Aligned.out.sam > /your/path/SRR8615934_hg_Aligned.out.bam
+samtools view -bS /your/path/SRR8615934_hg_filtered.sam > /your/path/SRR8615934_hg_filtered.bam
 ```
 
 ## BAM to BED
 
-Here is a script (make_bam_to_bed12.sh) to run. Make sure to run bam_to_bed12.sh afterwards to submit the jobs + mkdir bedfiles to store the output.
+Here is a script (make_bam_to_bed12.sh) to run. Make sure to run bam_to_bed12.sh afterwards to submit the jobs and create /bedfiles directory to store the output.
 
 ```
 #!/bin/bash
