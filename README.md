@@ -2,7 +2,7 @@
 
 Excited to work with RNA-seq data? 
 
-This repository includes everything you need for genome mapping. Raw FASTQ files serve as input and undergo genome alignment to a reference. We will go through this process step by step using the T2T reference.
+This repository includes everything you need for genome mapping. Raw FASTQ files serve as input and undergo genome alignment to a reference. We will go through this process step by step using the T2T and hg38 references.
 
 <img width="531" alt="Screenshot 2023-12-04 at 3 32 06 PM" src="https://github.com/emmarklein/RNAseq_pipeline/assets/152921397/41d26ea8-7045-4986-8ec6-e24e0dffa237">
 
@@ -42,7 +42,12 @@ Before we map the reads, we must build a genome index. Let's use the T2T referen
 module load star
 STAR --runThreadN 8 --runMode genomeGenerate --genomeDir /your/path/T2T_genomeDir --genomeFastaFiles /your/path/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna
 ```
-This command builds the index from the reference file and stores the genome index files in the directory, T2T_genomeDir.
+This command builds the index from the reference file and stores the genome index files in the directory, T2T_genomeDir. We can also do this with the hg38 reference and store the index files in /GRCh38_genomeDir.
+
+```
+module load star
+STAR --runThreadN 8 --runMode genomeGenerate --genomeDir /your/path/GRCh38_genomeDir --genomeFastaFiles /your/path/GRCh38.primary_assembly.genome.fa
+```
 
 ## STAR Alignment
 
@@ -57,9 +62,10 @@ In seed searching, STAR aligns reads with the longest sequence that matches one 
 ```
 module load star
 STAR --runThreadN 8 --genomeDir /your/path/T2T_genomeDir/ --outFileNamePrefix SRR8615934_ --readFilesIn /your/path/SRR8615934_1.fastq /your/path/SRR8615934_2.fastq
+STAR --runThreadN 8 --genomeDir /your/path/GRCh38_genomeDir/ --outFileNamePrefix SRR8615934_hg_ --readFilesIn /your/path/SRR8615934_1.fastq /your/path/SRR8615934_2.fastq
 ```
 
-This command uses the index files (in T2T_genomeDir) and FASTQ files for STAR alignment. The output of STAR aligner is read counts per gene! Specifically, we have a SAM file (Sequence Alignment/Map), which are text files that contain alignment information.
+These commands use the index files (in T2T_genomeDir and GRCh38_genomeDir) and FASTQ files for STAR alignment. The output of STAR aligner is read counts per gene! Specifically, we have a SAM file (Sequence Alignment/Map), which are text files that contain alignment information.
 
 ## Filtering (Optional)
 
@@ -73,97 +79,252 @@ Awesome! We can do a LOT with this information. For now, let's try making wiggle
 
 ## Wiggle Tracks
 
-To visualize our data, we can create wiggle tracks to upload to UCSC genome browser. Let's run bigsam_to_wig_mm10_wcigar4.pl on both filtered and unfiltered SAM files. This perl script takes in the parameters below to build wiggle tracks. 
+To visualize our data, we can create wiggle tracks to upload to UCSC genome browser. This part includes a few steps with some file type conversions.
 
-Parameters:
-1. SAM file
-2. chrNameLength.txt file generated in the genome build step of STAR
-3. Header for output files to be displayed in genome browser
-4. Color of the wiggle track
-5. Whether the data is paired-end
-6. Whether to log10 normalize the data
-7. Bin size for the wiggle track
+## SAM to BAM
 
 ```
-module load perl/5.18.2
-
-sbatch -t 48:00:00 --wrap="perl /your/path/bigsam_to_wig_mm10_wcigar4.pl /your/path/SRR8615934_Aligned.out.sam /your/path/T2T_genomeDir/chrNameLength.txt SRR8615934_unfiltered red y y 50"
-sbatch -t 48:00:00 --wrap="perl /your/path/bigsam_to_wig_mm10_wcigar4.pl /your/path/SRR8615934_filtered.sam /your/path/emma/T2T_genomeDir/chrNameLength.txt SRR8615934_filtered red y y 50"
+module load samtools
+samtools view -bS /your/path/SRR8615934_hg_Aligned.out.sam > /proj/brunklab/users/emma/SRR8615934_hg_Aligned.out.bam
+samtools view -bS /your/path/SRR8615934_hg_filtered.sam > /proj/brunklab/users/emma/SRR8615934_hg_filtered.bam
 ```
-The output is filtered and unfiltered .wig files. Before uploading them to UCSC, it is important to update the chromosome names. The script below (change_chromosome_names.py) changes chromosome names for T2T-CHM13 v2.0 to match the traditional chromosome names.
+
+## BAM to BED
+
+Here is a script (make_bam_to_bed12.sh) to run. Make sure to run bam_to_bed12.sh afterwards to submit the jobs + mkdir bedfiles to store the output.
 
 ```
-# changes chromosome names for T2T-CHM13 v2.0 to match the traditional chromosome names
-# input: T2T-CHM13 v2.0 based wiggle track
-# output: T2T-CHM13 v2.0 based wiggle track with chromosome names changed
+#!/bin/bash
+module load bedtools/2.29
 
-# usage: python change_chromosome_names.py <input_file>
+echo "#!/bin/bash" > bam_to_bed12.sh
 
+for file in your/path/*.bam
+do
+        file_name=$(basename $file ".bam")
+        echo $file_name
+        echo "sbatch -t 4:00:00 --wrap=\"bedtools bamtobed -bed12 -splitD -i ${file} > /your/path/bedfiles/${file_name}.bed\"" >> bam_to_bed12.sh
+done 
+```
+
+```
+mkdir bedfiles
+sbatch bam_to_bed12.sh
+```
+
+## Normalization
+
+In order to standardize the wiggle signal relative to the number of aligned reads in the dataset, we must count the number of reads in our alignment file with `run_count_reads.sh`. Make sure to `mkdir readcounts`!
+
+```
+mkdir readcounts
+```
+
+Here's our little script (run_count_reads.sh)!
+
+```
+module load samtools
+
+for file in /your/path/*.bam
+do
+        file_name=$(basename $file ".bam")
+        sbatch --wrap="samtools view -c $file > /your/path/readcounts/${file_name}_readcounts.txt"
+done
+```
+
+```
+sbatch run_count_reads.sh
+```
+
+## Finally.. Making Wiggle Tracks!
+
+After completion of all above jobs (not just submitting them, let them finish running), we need to make the actual wiggle tracks. 
+
+There are multiple parameters here to specify:
+
+#1. Path and name of your sample's Bed12 file
+#2. The path to the chrNameLength.txt file. This is generated by STAR during genome indexing and is stored in the genomeDir/ directory if you followed all of these instructions.*
+#3. Header for output files to be displayed in genome browser, often short yet descriptive. I avoid spaces.
+#4. Color of the wiggle track (I like to color +/- strand runs separate colors for easy visualization)
+#5. Whether to log10 normalize the data: y for log10 n for no normalization
+#6. Bin size for the wiggle track (50 nucleotides is our standard size)
+#7. Number of reads in the alignment (per wiggle track) for RPM standardization found in the readcounts file. If you don't wish to standardize by RPM, put the value 1 here.
+
+Here is a script to make the wiggles! (run_wiggle_script.sh)
+
+```
+#!/bin/bash
+
+sbatch --wrap="python3 make_wiggle_tracks_11_7_23.py $file $chrNameLengthfile header color lognormalize bin_size ${read_counts}"
+
+
+
+*Additionally, if you have pre-aligned data, Longleaf stores some the STAR index of certain genomes in proj, so you can look at the /proj/seq/data/STAR_genomes_v277/ to see if one relevant to your work is available. Older versions of STAR will not produce the file we need, so stick to more up to date versions for the chrNameLength.txt file.
+
+**If you followed my examples above with stranded data, you could use the following script to automatically generate your `run_wiggle_script.sh` commands (check chrNameLengthfile path and change the color, log10 normalization, bin size as desired):
+
+#!/bin/bash
+
+chrNameLengthfile="/your/path/chrNameLength.txt"
+echo "#!/bin/bash" > run_wiggle_script.sh
+
+for file in bedfiles/*.bed
+do	
+	file_name=$(basename $file ".bed")
+	# get the contents of the corresponding file from readcounts/
+	read_counts=$(cat readcounts/${file_name}_readcounts.txt)
+	# identify strand to assign color
+	if [[ $file_name == *+* ]]; then
+		echo "sbatch --wrap=\"python3 make_wiggle_tracks_11_7_23.py $file $chrNameLengthfile ${file_name} red n 50 ${read_counts}\"" >> run_wiggle_script.sh
+	elif [[ $file_name == *-* ]]; then
+		echo "sbatch --wrap=\"python3 make_wiggle_tracks_11_7_23.py $file $chrNameLengthfile ${file_name} blue n 50 ${read_counts}\"" >> run_wiggle_script.sh
+	else
+		echo $file_name
+	fi
+done
+```
+
+# Version for unstranded data:
+
+```
+#!/bin/bash
+
+sbatch --wrap="python3 make_wiggle_tracks_11_7_23.py $file $chrNameLengthfile header color lognormalize bin_size ${read_counts}"
+
+*Additionally, if you have pre-aligned data, Longleaf stores some the STAR index of certain genomes in proj, so you can look at the /proj/seq/data/STAR_genomes_v277/ to see if one relevant to your work is available. Older versions of STAR will not produce the file we need, so stick to more up to date versions for the chrNameLength.txt file.
+
+**If you followed my examples above with stranded data, you could use the following script to automatically generate your `run_wiggle_script.sh` commands (check chrNameLengthfile path and change the color, log10 normalization, bin size as desired):
+
+#!/bin/bash
+
+chrNameLengthfile="/your/path/chrNameLength.txt"
+echo "#!/bin/bash" > run_wiggle_script.sh
+
+for file in bedfiles/*.bed
+do	
+	file_name=$(basename $file ".bed")
+	# get the contents of the corresponding file from readcounts/
+	read_counts=$(cat readcounts/${file_name}_readcounts.txt)
+		echo "sbatch --wrap=\"python3 make_wiggle_tracks_11_7_23.py $file $chrNameLengthfile ${file_name} blue n 50 ${read_counts}\"" >> run_wiggle_script.sh
+done
+```
+
+And.. of course, you will need the actual Python script to make the wiggles! (make_wiggle_tracks_11_7_23.py)
+
+```
 import sys
-import os
-import re
+import math
 
-# open file from input parameter
-input_file = open(sys.argv[1], "r")
+# Import chrM warning: If you want to study chromosome M, note that if there are reads in the first 0-50 nucleotides those are not displayed,
+# and the last 50 nucleotides of reads are also not displayed. This is due to problems with visual cutoffs and chromosome lengths.
+# If you need coverage in these regions, please adjust the script accordingly.
 
-# open output file
-output_file_name = sys.argv[1].strip(".wig") + "_final.wig"
-output_file = open(output_file_name, "w")
+# Parameters:
+#1. Bed12 file
+#2. chrNameLength.txt file generated in the genome build step of STAR
+#3. Header for output files to be displayed in genome browser
+#4. Color of the wiggle track
+#5. Whether to log10 normalize the data: y for log10 n for no normalization
+#6. Bin size for the wiggle track
+#7. Number of reads in the dataset (per wiggle track) for RPM standardization. If you don't wish to standardize by RPM, put the value 1 here.
+
+# ex: python3 make_wiggle_tracks.py <bed12> <chrNameLength.txt> test-output blue n 50 1
+
+# import variables
+bedfile = sys.argv[1]
+chrNameLength = sys.argv[2]
+header = sys.argv[3]
+color = sys.argv[4]
+log10 = sys.argv[5]
+bin_size = int(sys.argv[6])
+reads_in_dataset = int(sys.argv[7])
 
 
-# create chromosome translation dictionary
-chromosome_translation = {
-    "NC_060925.1" : "chr1",
-    "NC_060926.1" : "chr2",
-    "NC_060927.1" : "chr3",
-    "NC_060928.1" : "chr4",
-    "NC_060929.1" : "chr5",
-    "NC_060930.1" : "chr6",
-    "NC_060931.1" : "chr7",
-    "NC_060932.1" : "chr8",
-    "NC_060933.1" : "chr9",
-    "NC_060934.1" : "chr10",
-    "NC_060935.1" : "chr11",
-    "NC_060936.1" : "chr12",
-    "NC_060937.1" : "chr13",
-    "NC_060938.1" : "chr14",
-    "NC_060939.1" : "chr15",
-    "NC_060940.1" : "chr16",
-    "NC_060941.1" : "chr17",
-    "NC_060942.1" : "chr18",
-    "NC_060943.1" : "chr19",
-    "NC_060944.1" : "chr20",
-    "NC_060945.1" : "chr21",
-    "NC_060946.1" : "chr22",
-    "NC_060947.1" : "chrX",
-    "NC_060948.1" : "chrY"
-    #, "NC_060949.1" : "chrM"
+if reads_in_dataset > 1:
+    rpm = reads_in_dataset/1000000
+else:
+    rpm = 1
+
+
+wig_dict = {}
+
+with open(chrNameLength, "r") as infile:
+    for line in infile:
+        cols = line.split("\t")
+        chrom = cols[0]
+        if "GL" not in chrom and "JH" not in chrom and "KI" not in chrom:
+            length = cols[1]
+            wig_dict[chrom] = {}
+
+# make the wiggle tracks
+with open(bedfile, "r") as infile:
+    for line in infile:
+        cols = line.split("\t")
+        chrom = cols[0]
+        if chrom in wig_dict.keys():
+            start = cols[1]
+            strand = cols[5]
+            block_sizes = cols[10].split(",")
+            block_starts = cols[11].split(",")
+
+            # find bin for each block of read
+            my_covered_bins = []
+
+            for i in range(len(block_sizes)):
+                block_size = int(block_sizes[i])
+                block_start = int(block_starts[i])
+                block_end = block_start + block_size
+                current_blockstart_bin = int(((int(start)+block_start)/bin_size))
+                current_blockend_bin = int(((int(start)+block_end)/bin_size))
+
+                for j in range(current_blockstart_bin, current_blockend_bin+1):
+                    my_covered_bins.append(j)
+                
+            fractional_coverage = 1/len(my_covered_bins)
+            for current_bin in my_covered_bins:
+                if current_bin not in wig_dict[chrom]:
+                    wig_dict[chrom][current_bin] = fractional_coverage
+                else:
+                    wig_dict[chrom][current_bin] += fractional_coverage
+
+# make three number code for color
+color_dict = {
+    "blue":"0,0,255",
+    "red":"255,0,0",
+    "green":"0,255,0",
+    "yellow":"255,255,0",
+    "orange":"255,165,0",
+    "purple":"128,0,128",
+    "pink":"255,192,203",
+    "black":"0,0,0",
 }
 
-# read each line of the input file
-for line in input_file:
-    # if the line starts with "variableStep", write it to the output file
-    if line.startswith("variableStep"):
-        components = line.split(" ")
-        chromosome = components[1].split("=")[1]
-        new_chrom = chromosome_translation[chromosome]
-        new_line = "variableStep chrom=" + new_chrom + " span=" + components[2].split("=")[1]
-        output_file.write(new_line)
+color_code = color_dict[color]
 
-    else:
-        output_file.write(line)
-    
+# Need to sort the order of the bins for output
+for chrom in wig_dict:
+    wig_dict[chrom] = dict(sorted(wig_dict[chrom].items()))
 
 
-input_file.close()
-output_file.close()
-```
+# delete the first and last bin in the chrM wig_dict dictionary
+if 0 in wig_dict["chrM"].keys():
+    del wig_dict["chrM"][0]
 
-Let's update the chromosome names to generate the final .wig files! Run the commands below with the path to your wiggle tracks from the previous step.
+last_bin = max(wig_dict["chrM"])
+del wig_dict["chrM"][last_bin]
 
-```
-sbatch --wrap="python3 change_chromosome_names.py /your/path/SRR8615934_filtered.wig"
-sbatch --wrap="python3 change_chromosome_names.py /your/path/SRR8615934_unfiltered.wig"
+# write the wiggle track file
+with open(header + ".wig", "w") as outfile:
+    outfile.write("track type=wiggle_0 visibility=full name=" + header + " description=" + header + " color=" + color_code +  " maxHeightPixels=128:40:11  group=\"user\" graphType=bar priority=100 viewLimits=0:2.8 autoscale=on\n")
+    for chrom in wig_dict:
+        outfile.write("variableStep chrom=" + chrom + " span=" + str(bin_size) + "\n")
+
+        for bin in wig_dict[chrom]:
+            bin_name = bin*50
+            if log10 == "y":
+                outfile.write(str(bin_name) + "\t" + str(math.log10(wig_dict[chrom][bin])/rpm) + "\n")
+            else:
+                outfile.write(str(bin_name) + "\t" + str(wig_dict[chrom][bin]/rpm) + "\n")      
 ```
 
 The .wig files can be uploaded to the [UCSC Genome Browser](https://genome.ucsc.edu/cgi-bin/hgCustom?hgsid=1804009504_57IfGr7IsksWm32NIHRQkaBNJSFc) for visualization. 
