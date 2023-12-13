@@ -182,7 +182,7 @@ do
 done
 ```
 
-# Version for unstranded data:
+### Version for unstranded data:
 
 ```
 #!/bin/bash
