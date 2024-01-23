@@ -69,11 +69,11 @@ These commands use the index files (in T2T_genomeDir and GRCh38_genomeDir) and F
 
 ## Filtering (Optional)
 
-Let's filter out the reads that are not meeting our quality threshold.
+Let's filter out the reads that are not meeting our quality threshold (q flag). Also, add -h to keep the header!!
 
 ```
 module load samtools
-samtools view -q 30 /your/path/SRR8615934_Aligned.out.sam > SRR8615934_filtered.sam
+samtools view -h -q 30 /your/path/SRR8615934_Aligned.out.sam > SRR8615934_filtered.sam
 ```
 Awesome! We can do a LOT with this information. For now, let's try making wiggle tracks to visualize the data.
 
