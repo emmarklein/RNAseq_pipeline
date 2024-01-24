@@ -329,7 +329,7 @@ The .wig files can be uploaded to the [UCSC Genome Browser](https://genome.ucsc.
 
 ## FeatureCounts to find read counts
 
-You can use any annotation file to get specific counts for genes, lncRNA, whatever your heart desires! Make sure you module load subread before you run FeatureCounts! 
+You can use any annotation file to get specific counts for genes, lncRNA, whatever your heart desires! Make sure you module load subread before running FeatureCounts! 
 
 ```
 #!/bin/bash
@@ -337,6 +337,7 @@ You can use any annotation file to get specific counts for genes, lncRNA, whatev
 sbatch -t 4:00:00 --wrap="featureCounts -p --countReadPairs -a gencode.v38.long_noncoding_RNAs.gtf -o /your/path/SRR8615934_hg_Aligned.out.bam.txt /proj/brunklab/users/emma/strands/SRR8615934_hg_Aligned.out.bam"
 ```
 
+The output should be text files with read count info in the last column :) have fun with that!
 
 
 
