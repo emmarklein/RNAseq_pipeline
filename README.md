@@ -327,6 +327,16 @@ with open(header + ".wig", "w") as outfile:
 
 The .wig files can be uploaded to the [UCSC Genome Browser](https://genome.ucsc.edu/cgi-bin/hgCustom?hgsid=1804009504_57IfGr7IsksWm32NIHRQkaBNJSFc) for visualization. 
 
+## FeatureCounts to find read counts
+
+You can use any annotation file to get specific counts for genes, lncRNA, whatever your heart desires! Make sure you module load subread before you run FeatureCounts! 
+
+```
+#!/bin/bash
+## Example with GRChg38 reference
+sbatch -t 4:00:00 --wrap="featureCounts -p --countReadPairs -a gencode.v38.long_noncoding_RNAs.gtf -o /your/path/SRR8615934_hg_Aligned.out.bam.txt /proj/brunklab/users/emma/strands/SRR8615934_hg_Aligned.out.bam"
+```
+
 
 
 
