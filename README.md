@@ -340,4 +340,9 @@ sbatch -t 4:00:00 --wrap="featureCounts -p --countReadPairs -a gencode.v38.long_
 The output should be text files with read count info in the last column :) have fun with that!
 
 
+## Acknowledgements
+
+This README.md was written by Emma Klein. The pipeline was constructed by Emma Klein with the help of Quinn Eberhard.
+
+
 
