@@ -342,7 +342,7 @@ The output should be text files with read count info in the last column :) have 
 
 ## Acknowledgements
 
-This README.md was written by Emma Klein. The pipeline was constructed by Emma Klein with the help of Quinn Eberhard.
+Written by Emma Klein. The pipeline was constructed with the help of Quinn Eberhard.
 
 
 
